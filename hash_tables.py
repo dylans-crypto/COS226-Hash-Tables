@@ -13,6 +13,24 @@ def totalRows(MOCK_DATA):
     with open(MOCK_DATA, "r", encoding="utf-8") as f:
         return sum(1 for line in f)
 
+def checkPrime(n):
+    if n <= 1: return 0
+    if n <= 3: return 1
+    if n % 2 == 0 or n % 3 == 0: return 0
+    i=5
+    while i * i <= n:
+        if n % i == 0 or n % (i+2) == 0: return 0
+        i+=6
+    return 1
+
+def prime(n):
+    if n <=2: return 2
+    number = n if n % 2 == 1 else n + 1
+    while checkPrime(number) == 0: 
+        number += 2
+    return number
+
+
 class Movie:
     def __init__(self, title, genre, data, director, revenue, rating, duration, company, quote):
         self.title = title
@@ -97,7 +115,9 @@ def loadMovies(MOCK_DATA):
 
 
 def main():
-    tableSize = totalRows("MOCK_DATA.csv")
+    originalNumber = int(totalRows("MOCK_DATA.csv") * 1.42875) #Makes the number of data = around .7 of the table size.
+
+    tableSize = prime(originalNumber)
 
     movies = loadMovies("MOCK_DATA.csv")
 
