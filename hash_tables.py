@@ -1,7 +1,8 @@
 #To start the code runs through the MOCK_DATA file and gets the total number of rows (the table size). Then the code will load the movie titles and quotes from MOCK_DATA into a list of movie objects. 
 #Then it will make 2 seperate hash tables using a linear probing approach to handle collisions.
-#The code will measure the number of collions, wasted spaces, and time to create each hash table. In this approach the data gets hashed by using ord() and adding up the total for each letter (poor hash funstion). 
-#Then the total gets % by the size of the table to create its index (key). Then the code brings it to that index and adds it into that indexs unless it's already filled. 
+#The code will measure the number of collions, wasted spaces, and time to create each hash table. In this approach the data gets hashed by using polynomial rolling which uses ord() 
+#on the char and two prime numbers 31 (larger than 26 the alphabets size) as well as 10**9+7. Using 10**9+7 as a % which will help lower collisions.
+#Then the remaining number gets % by the size of the table to create its index (key). Then the code brings it to that index and adds it into that indexs unless it's already filled. 
 #In which case it will run down the list till there is an open spot for the data.
 
 
@@ -32,15 +33,17 @@ class HashTable:
         self.values = [None] * size
 
         self.collisions = 0
+        #polynomial hash stuff
+        self.base = 31          #prime number larger than 26 (alphabet size)
+        self.mod = 10**9 + 7    #Super big prime number
 
-    #This is what gets the index (key) for the data. Adding up every ord() then % by the size of the table. Simple but can produce clustering.
+    #This is what gets the index (key) for the data. Uses polynomial rolling to hash the data.
     def hashFunction(self, key):
         total = 0
         for char in key:
-            total = total + ord(char)
-
-        return total % self.size        #Uses % to make sure the index is in the table.
-
+            total = (total * self.base + ord(char)) % self.mod  #For each char h increases by 1 (starting at 0) whihc gets multiplied by 31 (a prime number larger than 26) then using ord() on the char we get an int which gets % by the large prime number to lower collision chances.
+        return total % self.size        #Uses % again to reduce collisions and to make sure the index is in the table.
+    
     def insert(self, key, movie):
         index = self.hashFunction(key)
         start = index
@@ -53,6 +56,7 @@ class HashTable:
 
             self.collisions +=1
             index = (index + 1) % self.size
+
 
         self.keys[index] = key
         self.values[index] = movie
